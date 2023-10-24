@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: scm
+  name: pvc-nfs-scm
+  labels:
+    app: pvc-nfs-scm
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pvc-nfs-scm
+  template:
+    metadata:
+      labels:
+        app: pvc-nfs-scm
+    spec:
+      containers:
+      - name: nginx
+        image: daocloud.io/library/nginx:1.19.1
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: web
+          containerPort: 80
+        volumeMounts:
+        - name: www
+          subPath: nginx-data
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: www
+        persistentVolumeClaim:
+          claimName: pvc-nfs-scm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: scm
+  name: pvc-nfs-scm
+  labels:
+    app: pvc-nfs-scm
+spec:
+  selector:
+    app: pvc-nfs-scm
+  ports:
+  - port: 18080
+    targetPort: 80
+  type: NodePort
