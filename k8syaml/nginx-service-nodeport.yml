@@ -1,0 +1,28 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  name: nginx-service-nodeport
+  namespace: default
+  resourceVersion: '35603'
+spec:
+  clusterIP: 10.96.113.158
+  clusterIPs:
+    - 10.96.113.158
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - nodePort: 30001
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    name: nginx
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
