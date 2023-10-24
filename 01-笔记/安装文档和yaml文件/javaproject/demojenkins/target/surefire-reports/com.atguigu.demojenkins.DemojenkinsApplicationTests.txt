@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.atguigu.demojenkins.DemojenkinsApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 3.977 s - in com.atguigu.demojenkins.DemojenkinsApplicationTests
