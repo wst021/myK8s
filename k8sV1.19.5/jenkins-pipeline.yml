@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: scm
+  name: jenkins-pipeline
+  labels:
+    app: jenkins-pipeline
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: jenkins-pipeline
+  template:
+    metadata:
+      labels:
+        app: jenkins-pipeline
+    spec:
+      containers:
+        - name: jenkins-pipeline
+          image: 192.168.59.151:80/repository/pipeline-test:v0.0.10
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: scm
+  name: jenkins-pipeline
+  labels:
+    app: jenkins-pipeline
+spec:
+  selector:
+    app: jenkins-pipeline
+  ports:
+    - protocol: TCP
+      port: 18088
+      targetPort: 8080
+  type: NodePort
+

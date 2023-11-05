@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tomcat-yml
+  namespace: scm
+spec:
+  containers:
+  - image: daocloud.io/library/tomcat:8.5.57
+    name: tomcat-yml
