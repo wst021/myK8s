@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scmGit(branches: [[name: '${tag}']], extensions: [], userRemoteConfigs: [[url: 'http://192.168.59.149:8989/root/hellospringboot.git']])
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Build Succeeded ..'
+            }
+        }
+        stage('SonarQube') {
+            steps {
+                echo 'SonarQube Succeeded ..'
+            }
+        }
+        stage('Push') {
+            steps {
+                echo 'Push Succeeded ..'
+            }
+        }
+    }
+}
