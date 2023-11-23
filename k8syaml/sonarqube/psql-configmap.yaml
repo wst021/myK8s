@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+  namespace: cicd
+data:
+  POSTGRES_DB: sonardb
+  POSTGRES_USER: sonaradmin
+  POSTGRES_PASSWORD: sonar1357
