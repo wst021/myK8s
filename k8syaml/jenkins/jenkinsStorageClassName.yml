@@ -43,6 +43,11 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: jenkins-pv-data
+      resources:
+        requests:
+          memory: "1Gi"
+        limits:
+          memory: "1Gi"
 
 ---
 apiVersion: v1
