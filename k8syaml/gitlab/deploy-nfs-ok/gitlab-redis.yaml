@@ -41,7 +41,10 @@ spec:
           timeoutSeconds: 1
       volumes:
       - name: data
-        emptyDir: {}
+        nfs:
+          server: 192.168.59.170
+          path: /data/gitlabDB/redis
+          readOnly: false
 ---
 apiVersion: v1
 kind: Service
