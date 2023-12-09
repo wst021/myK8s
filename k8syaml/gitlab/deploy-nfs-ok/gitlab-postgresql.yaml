@@ -1,3 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postsql-pvc-data
+  namespace: scm
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: mycluster-storage
+  resources:
+    requests:
+      storage: 10Gi
+      
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,6 +20,7 @@ metadata:
   labels:
     name: postgresql
 spec:
+  replicas: 1
   selector:
     matchLabels:
       name: postgresql
@@ -17,9 +32,12 @@ spec:
     spec:
       containers:
       - name: postgresql
-        image: sameersbn/postgresql
+        image: postgres:13.11
+        //image: sameersbn/postgresql
         imagePullPolicy: IfNotPresent
         env:
+        - name: POSTGRES_PASSWORD
+          value: posqladmin
         - name: DB_USER
           value: gitlab
         - name: DB_PASS
@@ -56,10 +74,12 @@ spec:
           timeoutSeconds: 5
       volumes:
       - name: data
-        nfs:
-          server: 192.168.59.170
-          path: /data/gitlabDB/postgresql
-          readOnly: false
+        persistentVolumeClaim:
+          claimName: postsql-pvc-data
+        //nfs:
+          //server: 192.168.59.170
+          //path: /data/gitlabDB/postgresql
+          //readOnly: false
 ---
 apiVersion: v1
 kind: Service
