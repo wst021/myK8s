@@ -1,3 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gitlab-pvc-data
+  namespace: scm
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: mycluster-storage
+  resources:
+    requests:
+      storage: 25Gi
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -39,7 +53,7 @@ spec:
         - name: GITLAB_PORT
           value: "80"
         - name: GITLAB_SSH_PORT
-          value: "30022"
+          value: "22"
         - name: GITLAB_NOTIFY_ON_BROKEN_BUILDS
           value: "true"
         - name: GITLAB_NOTIFY_PUSHER
@@ -68,27 +82,34 @@ spec:
         - name: http
           containerPort: 80
         - name: ssh
-          containerPort: 22
+          containerPort: 30022
         volumeMounts:
-        - name: gitlab-config
-          mountPath: /etc/gitlab
-        - name: gitlab-logs
-          mountPath: /var/log/gitlab
-        - name: gitlab-data
+        - name: data
           mountPath: /var/opt/gitlab
+        - name: data
+          mountPath: /etc/gitlab
+        //- name: gitlab-config
+          //mountPath: /etc/gitlab
+        //- name: gitlab-logs
+          //mountPath: /var/log/gitlab
+        //- name: gitlab-data
+          //mountPath: /var/opt/gitlab
       volumes:
-      - name: gitlab-config
-        nfs:
-          server: 192.168.59.170
-          path: /data/gitlabDB/config
-      - name: gitlab-logs
-        nfs:
-          server: 192.168.59.170
-          path: /data/gitlabDB/logs
-      - name: gitlab-data
-        nfs:
-          server: 192.168.59.170
-          path: /data/gitlabDB/data
+      - name: data
+        persistentVolumeClaim:
+          claimName: gitlab-pvc-data
+      //- name: gitlab-config
+        //nfs:
+          //server: 192.168.59.170
+          //path: /data/gitlabDB/config
+      //- name: gitlab-logs
+        //nfs:
+          //server: 192.168.59.170
+          //path: /data/gitlabDB/logs
+      //- name: gitlab-data
+        //nfs:
+          //server: 192.168.59.170
+          //path: /data/gitlabDB/data
 ---
 apiVersion: v1
 kind: Service
