@@ -1,0 +1,159 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  labels:
+    name: gitlab
+  name: gitlab
+  namespace: scm
+  resourceVersion: '683872'
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      name: gitlab
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        name: gitlab
+      name: gitlab
+    spec:
+      containers:
+        - env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: GITLAB_TIMEZONE
+              value: Beijing
+            - name: GITLAB_SECRETS_DB_KEY_BASE
+              value: long-and-random-alpha-numeric-string
+            - name: GITLAB_SECRETS_SECRET_KEY_BASE
+              value: long-and-random-alpha-numeric-string
+            - name: GITLAB_SECRETS_OTP_KEY_BASE
+              value: long-and-random-alpha-numeric-string
+            - name: GITLAB_ROOT_PASSWORD
+              value: scmadmin1
+            - name: GITLAB_ROOT_EMAIL
+              value: yjg021@163.com
+            - name: GITLAB_HOST
+              value: '0.0.0.0:30567'
+            - name: GITLAB_PORT
+              value: '80'
+            - name: GITLAB_SSH_PORT
+              value: '22'
+            - name: GITLAB_NOTIFY_ON_BROKEN_BUILDS
+              value: 'true'
+            - name: GITLAB_NOTIFY_PUSHER
+              value: 'false'
+            - name: GITLAB_BACKUP_SCHEDULE
+              value: daily
+            - name: GITLAB_BACKUP_TIME
+              value: '01:00'
+            - name: DB_TYPE
+              value: postgres
+            - name: DB_HOST
+              value: postgresql
+            - name: DB_PORT
+              value: '5432'
+            - name: DB_USER
+              value: gitlab
+            - name: DB_PASS
+              value: passW1ord
+            - name: DB_NAME
+              value: gitlab_production
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: '6379'
+          image: 'gitlab/gitlab-ce:16.5.0-ce.0'
+          imagePullPolicy: IfNotPresent
+          name: gitlab
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 30022
+              name: ssh
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /var/opt/gitlab
+              name: data
+            - mountPath: /etc/gitlab
+              name: data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: gitlab-pvc-data
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: '2023-12-09T17:16:06Z'
+      lastUpdateTime: '2023-12-09T17:16:10Z'
+      message: ReplicaSet "gitlab-f4b78598b" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+    - lastTransitionTime: '2023-12-10T09:56:39Z'
+      lastUpdateTime: '2023-12-10T09:56:39Z'
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    name: gitlab
+  name: gitlab
+  namespace: scm
+  resourceVersion: '662639'
+spec:
+  clusterIP: 10.96.70.187
+  clusterIPs:
+    - 10.96.70.187
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - name: http
+      nodePort: 30567
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: ssh
+      nodePort: 30022
+      port: 22
+      protocol: TCP
+      targetPort: ssh
+  selector:
+    name: gitlab
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
+
