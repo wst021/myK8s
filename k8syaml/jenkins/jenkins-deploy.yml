@@ -1,3 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins-pv-data
+  namespace: cicd
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: mycluster-storage
+  resources:
+    requests:
+      storage: 20Gi
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,12 +37,13 @@ spec:
           - containerPort: 8080
           - containerPort: 50000
         volumeMounts:
-        - name: jenkins-pv
+        - name: data
           mountPath: /var/jenkins_home
       volumes:
-      - name: jenkins-pv
+      - name: data
         persistentVolumeClaim:
-          claimName: jenkins-pvc
+          claimName: jenkins-pv-data
+
 ---
 apiVersion: v1
 kind: Service
@@ -45,3 +60,26 @@ spec:
       port: 18080
       targetPort: 8080
   type: LoadBalancer
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jenkins
+  namespace: cicd
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: cicd.jenkins.com
+    http:
+      paths:
+      - path: /
+        backend:
+          service:
+            name: jenkins
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
