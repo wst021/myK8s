@@ -1,0 +1,129 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  labels:
+    app: jenkins
+  name: jenkins
+  namespace: cicd
+  resourceVersion: '882339'
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: jenkins
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: jenkins
+    spec:
+      containers:
+        - image: 'jenkins/jenkins:2.414.3'
+          imagePullPolicy: IfNotPresent
+          name: jenkins
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 50000
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /var/jenkins_home
+              name: data
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: jenkins-pv-data
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: '2023-12-03T19:19:44Z'
+      lastUpdateTime: '2023-12-03T19:19:47Z'
+      message: ReplicaSet "jenkins-654db8bffb" has successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+      type: Progressing
+    - lastTransitionTime: '2023-12-18T20:03:45Z'
+      lastUpdateTime: '2023-12-18T20:03:45Z'
+      message: Deployment has minimum availability.
+      reason: MinimumReplicasAvailable
+      status: 'True'
+      type: Available
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updatedReplicas: 1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations: {}
+  labels:
+    app: jenkins
+  name: jenkins
+  namespace: cicd
+  resourceVersion: '514758'
+spec:
+  allocateLoadBalancerNodePorts: true
+  clusterIP: 10.96.147.245
+  clusterIPs:
+    - 10.96.147.245
+  externalTrafficPolicy: Cluster
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+    - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+    - nodePort: 32090
+      port: 18080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: jenkins
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer: {}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+  name: jenkins
+  namespace: cicd
+  resourceVersion: '514761'
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: cicd.jenkins.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: jenkins
+                port:
+                  number: 8080
+            path: /
+            pathType: Prefix
+status:
+  loadBalancer: {}
+
