@@ -1,0 +1,31 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    pv.kubernetes.io/bind-completed: 'yes'
+    pv.kubernetes.io/bound-by-controller: 'yes'
+    volume.beta.kubernetes.io/storage-provisioner: nfs-mycluster-storage
+    volume.kubernetes.io/selected-node: k8sworker1
+    volume.kubernetes.io/storage-provisioner: nfs-mycluster-storage
+  finalizers:
+    - kubernetes.io/pvc-protection
+  name: gitlab-pvc-data
+  namespace: scm
+  resourceVersion: '930663'
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 25Gi
+  storageClassName: mycluster-storage
+  volumeMode: Filesystem
+  volumeName: pvc-987f9fe4-cc58-4813-8cc3-c98915c15365
+status:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 25Gi
+  phase: Bound
+
