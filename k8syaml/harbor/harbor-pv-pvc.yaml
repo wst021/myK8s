@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-chartmuseum
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce             # 只允许一个容器可以使用
+  persistentVolumeReclaimPolicy: Retain         # 手动回收
+  storageClassName: harbor-chartmuseum
+  nfs:
+    path: /data/shareNFS/harbor/harbor-chartmuseum
+    server: 10.52.16.31
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-jobservice
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce             # 只允许一个容器可以使用
+  persistentVolumeReclaimPolicy: Retain         # 手动回收
+  storageClassName: harbor-jobservice
+  nfs:
+    path: /data/shareNFS/harbor/harbor-jobservice
+    server: 10.52.16.31
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-registry
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce             # 只允许一个容器可以使用
+  persistentVolumeReclaimPolicy: Retain         # 手动回收
+  storageClassName: harbor-registry
+  nfs:
+    path: /data/shareNFS/harbor/harbor-registry
+    server: 10.52.16.31
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-database
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce             # 只允许一个容器可以使用
+  persistentVolumeReclaimPolicy: Retain         # 手动回收
+  storageClassName: harbor-database
+  nfs:
+    path: /data/shareNFS/harbor/harbor-database
+    server: 10.52.16.31
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-redis
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce             # 只允许一个容器可以使用
+  persistentVolumeReclaimPolicy: Retain         # 手动回收
+  storageClassName: harbor-redis
+  nfs:
+    path: /data/shareNFS/harbor/harbor-redis
+    server: 10.52.16.31
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-trivy
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce             # 只允许一个容器可以使用
+  persistentVolumeReclaimPolicy: Retain         # 手动回收
+  storageClassName: harbor-trivy
+  nfs:
+    path: /data/shareNFS/harbor/harbor-trivy
+    server: 10.52.16.31
